@@ -11,10 +11,12 @@ cap = cv.VideoCapture(0)
 if not cap.isOpened():
     print("Cannot open camera")
     exit()
+    
+first = True
 while True:
     # Capture frame-by-frame
     ret, frame = cap.read()
- 
+
     # turn the image into mirror image 
     frame = cv.flip(frame, 1)
     height, width = frame.shape[:2]
@@ -29,8 +31,23 @@ while True:
         break
     # Our operations on the frame come here
     gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+    if first:
+        prev_gray = gray
+        first = False
+
+    # calculate change in gray 
+    delta = cv.absdiff(gray,prev_gray).sum()
 
     # Display text
+    cv.putText(frame, 
+        str(delta), # Text
+        (50,300), # Org
+        cv.FONT_HERSHEY_SIMPLEX, #font 
+        2, # font Scale
+        (255,255,255), #color
+        4 #thickness
+        )
+
     cv.putText(frame, 
         "Hello", # Text
         (50,100), # Org
@@ -38,10 +55,16 @@ while True:
         2, # font Scale
         (100,0,100), #color
         4 #thickness
-             )
+        )
 
     # Display the resulting frame
+    # cv.imshow('frame', gray)
     cv.imshow('frame', frame)
+
+    # Save prev frame
+    prev_frame= gray
+
+    #see if user wants to quit 
     if cv.waitKey(1) == ord('q'):
         break
 
